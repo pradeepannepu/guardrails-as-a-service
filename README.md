@@ -1,19 +1,5 @@
 # guardrails-as-a-service
 
-we are building a mini project for software design and development mtech level course. 
-Here is the description of the proposal
-
-Guardrails as a Service is to study software-design principles for building an enterprise-grade, scalable policy/guardrail platform. The proposed design follows a microservices-based architecture deployed over Kubernetes, leveraging API Gateway, Policy Management Service, Evaluation Plane, and Audit Logging subsystems, PostgreSQL for vector search, Redis for caching, Kafka or Pub/Sub for event-driven evaluation.
-The expected outcome of this project is a high-level architectural blueprint demonstrating how enterprise-grade “guardrails” can be offered as a modular and extensible service
-
-
-Here is the expectations: 
-1. arch diagrams
-2. sample code implementation 
-3. readme with how to run project 
-4. compare the results with any existing solution 
-5. make sure we include atleast 3 quality attributes for software design with proof and justfication
-
 ## Architecture Overview
 ```mermaid
 flowchart LR
