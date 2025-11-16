@@ -7,38 +7,40 @@
 \usepackage{enumitem}
 \hypersetup{colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue}
 
-\title{Guardrails-as-a-Service: Hybrid Deterministic and Semantic Policy Evaluation}
+\title{Guardrails-as-a-Service}
 
 \author{
-\IEEEauthorblockN{Pradeep Annepu, Rajesh Akula}
-\IEEEauthorblockA{Email: \{M25AI1109, M25AI1109\}@iitj.ac.in}
+\IEEEauthorblockN{Pradeep Annepu, Akula Rajesh, Amarendra Chakravarthi, Anirudh Reddy}
+\IEEEauthorblockA{Email: \{M25AI1109, M25AI1048, M25AI1082, M25AI1131\}@iitj.ac.in}
 }
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-  We present the architecture and planned evaluation of a cloud-agnostic Guardrails-as-a-Service platform that integrates deterministic rule evaluation with semantic vector retrieval to enforce complex governance policies for AI-enabled systems. The design emphasizes scalability via stateless microservices and asynchronous event flow, extensibility through a handler abstraction, and audit integrity using hash-chained decision logs. We define measurable quality attributes (latency, throughput, extensibility effort, audit lag) and outline empirical validation strategies supporting operational assurance and trust.
+  We present the architecture and planned evaluation of a Guardrails-as-a-Service platform. The system is designed to scale: it runs as stateless microservices connected by asynchronous events.It’s easy to extend because new handlers can be plugged in without changing the core. Every decision was logged in event driven way to scale independently. We trianed a gemma model with custom domain language to act as a guard model. We define measurable quality attributes (latency, throughput) using a load testing.
 \end{abstract}
 
 \begin{IEEEkeywords}
-  Policy enforcement, microservices, vector similarity, audit logging, hash chaining, observability, cloud governance.
+  Policy enforcement, microservices, vector similarity, audit logging, observability, gemma, guardrails.
 \end{IEEEkeywords}
 
 \section{Introduction}
-Dynamic policy enforcement in modern distributed and AI-centric systems requires synthesizing explicit rules with semantic context. Traditional engines (e.g., Open Policy Agent (OPA) \cite{opa}) optimize declarative logic but lack native semantic retrieval. Cloud-specific governance (e.g., AWS Control Tower guardrails \cite{awsguardrails}) constrains portability. We address these gaps with a hybrid evaluation plane coupling rule logic and embedding similarity, backed by an integrity-focused audit pipeline.
+Enterprises increasingly rely on the agentic systems and exposing varous tools and capabilities to their customers. The need for guarding the tools and capabilities is also increasing with these new systems. Training a large language model from the scratch can be a expensive affair for the many enterprises and many make use of the open source/weight llm models available in the market. These open models have trained in general and may not be alighed with enterprises needs and their domain knowledge. Hence the need for guardrails to these models is required for enterpises to avoid any legal and compliance issues. It is also very important to save their inference cost by avoiding any unwanted/unnecessary calls to the llm models. For example, if an enterprise of payment gateway is exposing an agentic systems to their customers to help with their support queries, but hackers may try to exploit the system to get the sensitive information or even play with it general discussion which may not be related to the customer business, which can lead to huge inference cost to the company.
+
+It is not a one time job for these enterprises to set these guardrails and forget about it, as the business needs and complaince requirements keep changing, these guardrails need to be updated frequently. Hence the need for a policy service which can help enterprises to create, update and manage these guardrails easily.We address these gaps by designing a scalable system for the guardrails evaluation and continuous policy updates and management in this study.
 
 \section{Contributions}
 The work provides: (1) A hybrid evaluation architecture combining deterministic rule filtering and vector similarity; (2) An extensible handler interface enabling semantic and emerging policy types with low change cost; (3) A hash-linked audit log for tamper-evidence without blockchain overhead; (4) A metrics-driven evaluation plan aligning architectural tactics with verifiable quality attributes.
 
 \section{System Architecture}
 \begin{figure}[htbp]
-  \centerline{\includegraphics[width=\columnwidth]{hld_design.png}}
+  \centerline{\includegraphics[width=\columnwidth]{services.png}}
   \caption{System Architecture: Hybrid policy evaluation with event-driven decoupling}
-  \label{fig:hld_design}
+  \label{fig:services}
 \end{figure}
 
-Fig.~\ref{fig:hld_design} System Architecture
+Refer Fig.~\ref{fig:services} For System Architecture
 
 \noindent Core components:
 \begin{itemize}[leftmargin=*]
@@ -54,9 +56,33 @@ Fig.~\ref{fig:hld_design} System Architecture
 \section{Design Methodology}
 Microservice decomposition isolates policy mutation from evaluation throughput. Event-driven processing reduces synchronous coupling. Vector similarity augments metadata filtering, allowing semantically proximate policy selection. Hash chaining supplies integrity assurance with linear verification.
 
+\begin{figure*}[htbp]
+  \centerline{\includegraphics[width=\textwidth]{c4.png}}
+  \caption{System Architecture: Hybrid policy evaluation with event-driven decoupling}
+  \label{fig:c4}
+\end{figure*}
+
+\begin{figure}[htbp]
+  \centerline{\includegraphics[width=\columnwidth]{domain_model.png}}
+  \caption{System Architecture: Hybrid policy evaluation with event-driven decoupling}
+  \label{fig:domain_model}
+\end{figure}
+
+\begin{figure*}[htbp]
+  \centerline{\includegraphics[width=\textwidth]{sequence.png}}
+  \caption{System Architecture: Hybrid policy evaluation with event-driven decoupling}
+  \label{fig:sequence}
+\end{figure*}
+
 \section{Quality Attributes}
 \subsection{Scalability}
 Tactics: Stateless pods, horizontal autoscaling, Redis caching, asynchronous buffering. Metrics: P95 latency $<150$\,ms under 2000 requests/sec; cache hit ratio correlated with latency reduction.
+
+\begin{figure}[htbp]
+  \centerline{\includegraphics[width=\columnwidth]{load_test_result_1.png}}
+  \caption{System Architecture: Hybrid policy evaluation with event-driven decoupling}
+  \label{fig:load_test_result_1}
+\end{figure}
 
 \subsection{Extensibility}
 A \texttt{PolicyHandler} interface:
@@ -104,7 +130,7 @@ OPA \cite{opa} offers strong declarative evaluation but lacks semantic retrieval
 The proposed Guardrails-as-a-Service platform aligns architectural tactics with measurable quality attributes. Hybrid policy evaluation and hash-linked auditing together enhance governance fidelity and trust. Future work targets production hardening, expanded semantic handlers, and full distributed tracing.
 
 \section*{Acknowledgment}
-Omitted for anonymity.
+The authors would like to thank the Indian Institute of Technology Jodhpur for supporting this study.
 
 \begin{thebibliography}{99}
   \bibitem{opa} Open Policy Agent Documentation. [Online]. Available: \url{https://www.openpolicyagent.org}
