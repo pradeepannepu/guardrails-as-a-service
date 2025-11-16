@@ -2,7 +2,7 @@ import express from "express";
 import { Pool } from "pg";
 import Redis from "ioredis";
 import client from "prom-client";
-import "../otel/init"; // optional OTEL init (create file if needed)
+import "../../../shared/otel/init"; 
 
 const app = express();
 app.use(express.json());

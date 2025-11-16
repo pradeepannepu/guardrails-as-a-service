@@ -1,0 +1,17 @@
+{
+  "name": "model-inference-service",
+  "version": "1.0.0",
+  "description": "Guardrails model inference service",
+  "scripts": {
+    "start": "python src/inference-server.py",
+    "dev": "uvicorn src.inference-server:app --reload --host 0.0.0.0 --port 8000",
+    "install": "pip install -r requirements.txt"
+  },
+  "keywords": [
+    "inference",
+    "guardrails",
+    "fastapi"
+  ],
+  "author": "",
+  "license": "MIT"
+}

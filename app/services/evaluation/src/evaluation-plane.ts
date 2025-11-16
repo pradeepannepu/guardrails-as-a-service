@@ -4,6 +4,8 @@ import { Kafka } from "kafkajs";
 import crypto from "crypto";
 import client from "prom-client";
 import "../otel/init";
+import { llmHandler } from "./handlers/llm-handler";
+import { pytorchHandler } from "./handlers/pytorch-handler";
 
 const app = express();
 app.use(express.json());
@@ -40,12 +42,7 @@ const ruleHandler: Handler = {
   },
 };
 
-const semanticHandler: Handler = {
-  supports: (t) => t === "semantic",
-  evaluate: async () => true, // stub
-};
-
-const handlers: Handler[] = [ruleHandler, semanticHandler];
+const handlers: Handler[] = [ruleHandler, llmHandler, pytorchHandler];
 
 app.post("/evaluate", async (req, res) => {
   const endTimer = evalLatency.startTimer();
@@ -55,7 +52,7 @@ app.post("/evaluate", async (req, res) => {
 
   const { resource, query } = req.body;
   const policySvcUrl =
-    process.env.POLICY_SVC_URL || "http://policy-svc:3001/policies/search";
+    process.env.POLICY_SVC_URL || "http://policy-svc:3002/policies/search";
   const { data: policies } = await axios.get(policySvcUrl, {
     params: { q: query },
   });

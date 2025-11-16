@@ -1,0 +1,14 @@
+{
+  "name": "guardrails-as-a-service",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix app/services/evaluation\" \"npm run dev --prefix app/services/policy\" \"npm run dev --prefix app/services/audit\"",
+    "start": "concurrently \"npm start --prefix app/services/evaluation\" \"npm start --prefix app/services/policy\" \"npm start --prefix app/services/audit\"",
+    "build": "npm run build --prefix app/services/evaluation && npm run build --prefix app/services/policy && npm run build --prefix app/services/audit",
+    "install-all": "npm install && npm install --prefix app/services/evaluation && npm install --prefix app/services/policy && npm install --prefix app/services/audit"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
