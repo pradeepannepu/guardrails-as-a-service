@@ -88,6 +88,20 @@ Add new handlers by implementing interface; register via DI container.
 - Security hardening (mTLS between services).
 
 
+## Load test 
 
+install k6 on mac
+```sh
+brew install k6
+```
 
+install k6 on windows
+
+```sh
+choco install k6
+```
+to run the load test 
+```sh
+    k6 run --out web-dashboard our_model_load_test.js
+```
 

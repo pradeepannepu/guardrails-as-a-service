@@ -42,9 +42,9 @@ async function main() {
       console.log(
         JSON.stringify({
           type: "AUDIT_EVENT",
-            correlationId: payload.correlationId,
-            hash: newHash,
-            lagMs: lag,
+          correlationId: payload.correlationId,
+          hash: newHash,
+          lagMs: lag,
         })
       );
     },

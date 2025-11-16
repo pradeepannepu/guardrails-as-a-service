@@ -7,22 +7,22 @@
 \usepackage{enumitem}
 \hypersetup{colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue}
 
-\title{Guardrails-as-a-Service: Hybrid Deterministic and Semantic Policy Evaluation with Tamper-Evident Auditability}
+\title{Guardrails-as-a-Service: Hybrid Deterministic and Semantic Policy Evaluation}
 
 \author{
-\IEEEauthorblockN{(Author Name Redacted)}
-\IEEEauthorblockA{Email: contact@example.com}
+\IEEEauthorblockN{Pradeep Annepu, Rajesh Akula}
+\IEEEauthorblockA{Email: \{M25AI1109, M25AI1109\}@iitj.ac.in}
 }
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-We present the architecture and planned evaluation of a cloud-agnostic Guardrails-as-a-Service platform that integrates deterministic rule evaluation with semantic vector retrieval to enforce complex governance policies for AI-enabled systems. The design emphasizes scalability via stateless microservices and asynchronous event flow, extensibility through a handler abstraction, and audit integrity using hash-chained decision logs. We define measurable quality attributes (latency, throughput, extensibility effort, audit lag) and outline empirical validation strategies supporting operational assurance and trust.
+  We present the architecture and planned evaluation of a cloud-agnostic Guardrails-as-a-Service platform that integrates deterministic rule evaluation with semantic vector retrieval to enforce complex governance policies for AI-enabled systems. The design emphasizes scalability via stateless microservices and asynchronous event flow, extensibility through a handler abstraction, and audit integrity using hash-chained decision logs. We define measurable quality attributes (latency, throughput, extensibility effort, audit lag) and outline empirical validation strategies supporting operational assurance and trust.
 \end{abstract}
 
 \begin{IEEEkeywords}
-Policy enforcement, microservices, vector similarity, audit logging, hash chaining, observability, cloud governance.
+  Policy enforcement, microservices, vector similarity, audit logging, hash chaining, observability, cloud governance.
 \end{IEEEkeywords}
 
 \section{Introduction}
@@ -32,17 +32,23 @@ Dynamic policy enforcement in modern distributed and AI-centric systems requires
 The work provides: (1) A hybrid evaluation architecture combining deterministic rule filtering and vector similarity; (2) An extensible handler interface enabling semantic and emerging policy types with low change cost; (3) A hash-linked audit log for tamper-evidence without blockchain overhead; (4) A metrics-driven evaluation plan aligning architectural tactics with verifiable quality attributes.
 
 \section{System Architecture}
-Fig.~\ref{fig:arch} conceptually partitions concerns: policy lifecycle management, evaluation, event streaming, caching, and observability. Decoupling via a message broker enables back-pressure handling and horizontal scale.
+\begin{figure}[htbp]
+  \centerline{\includegraphics[width=\columnwidth]{hld_design.png}}
+  \caption{System Architecture: Hybrid policy evaluation with event-driven decoupling}
+  \label{fig:hld_design}
+\end{figure}
+
+Fig.~\ref{fig:hld_design} System Architecture
 
 \noindent Core components:
 \begin{itemize}[leftmargin=*]
-\item API Gateway: Authentication, authorization, rate limiting.
-\item Policy Service: CRUD, versioning, vector indexing (pgvector \cite{pgvector}).
-\item Evaluation Plane: Cache-first retrieval, rule + semantic evaluation, decision event emission.
-\item Audit Logger: Consumes decision events; persists hash-chained records.
-\item Redis: Low-latency hot-set and embedding cache.
-\item Broker: Decouples evaluation from persistence; supports resilience tests.
-\item Observability Stack: Metrics (Prometheus \cite{prometheus}), logs, planned traces (OpenTelemetry \cite{otel}).
+  \item API Gateway: Authentication, authorization, rate limiting.
+  \item Policy Service: CRUD, versioning, vector indexing (pgvector \cite{pgvector}).
+  \item Evaluation Plane: Cache-first retrieval, rule + semantic evaluation, decision event emission.
+  \item Audit Logger: Consumes decision events; persists hash-chained records.
+  \item Redis: Low-latency hot-set and embedding cache.
+  \item Broker: Decouples evaluation from persistence; supports resilience tests.
+  \item Observability Stack: Metrics (Prometheus \cite{prometheus}), logs, planned traces (OpenTelemetry \cite{otel}).
 \end{itemize}
 
 \section{Design Methodology}
@@ -54,10 +60,10 @@ Tactics: Stateless pods, horizontal autoscaling, Redis caching, asynchronous buf
 
 \subsection{Extensibility}
 A \texttt{PolicyHandler} interface:
-\begin{lstlisting}[language=TypeScript,basicstyle=\ttfamily\small]
+\begin{lstlisting}[language=java,basicstyle=\ttfamily\small]
 export interface PolicyHandler {
   supports(policyType: string): boolean;
-  evaluate(context: any, policy: Policy): Promise<Decision>;
+  evaluate(context: any, policy: Policy): Promise;
 }
 \end{lstlisting}
 New handlers (e.g., advanced semantic constraint) integrate via dependency injection without core modification. Verification: Diff locality; unchanged regression suite; cyclomatic complexity < 10.
@@ -101,11 +107,11 @@ The proposed Guardrails-as-a-Service platform aligns architectural tactics with 
 Omitted for anonymity.
 
 \begin{thebibliography}{99}
-\bibitem{opa} Open Policy Agent Documentation. [Online]. Available: \url{https://www.openpolicyagent.org}
-\bibitem{awsguardrails} AWS Control Tower Guardrails. [Online]. Available: \url{https://docs.aws.amazon.com/controltower}
-\bibitem{prometheus} Prometheus Documentation. [Online]. Available: \url{https://prometheus.io}
-\bibitem{pgvector} pgvector Extension Documentation. [Online]. Available: \url{https://github.com/pgvector/pgvector}
-\bibitem{otel} OpenTelemetry Specification. [Online]. Available: \url{https://opentelemetry.io}
+  \bibitem{opa} Open Policy Agent Documentation. [Online]. Available: \url{https://www.openpolicyagent.org}
+  \bibitem{awsguardrails} AWS Control Tower Guardrails. [Online]. Available: \url{https://docs.aws.amazon.com/controltower}
+  \bibitem{prometheus} Prometheus Documentation. [Online]. Available: \url{https://prometheus.io}
+  \bibitem{pgvector} pgvector Extension Documentation. [Online]. Available: \url{https://github.com/pgvector/pgvector}
+  \bibitem{otel} OpenTelemetry Specification. [Online]. Available: \url{https://opentelemetry.io}
 \end{thebibliography}
 
 \end{document}
