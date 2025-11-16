@@ -1,0 +1,265 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{Madrid}
+\usecolortheme{default}
+
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tikz}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\title{Guardrails as a Service}
+\subtitle{CSL7090 - Project , IIT Jodhpur}
+% \author{}
+\titlegraphic{\includegraphics[width=1cm]{logo.jpg}}
+\institute{IIT Jodhpur}
+\date{\today}
+
+\begin{document}
+
+% Title Page
+\begin{frame}
+    \titlepage
+    % \vspace{0.5cm}
+    \begin{center}
+        \textbf{Members:}\\
+        Pradeep Annepu (M25AI1109) \quad Rajesh Akula (M25AI1109) \\
+        V Amarendra Chakravarthi (M25AI1109) \quad Anirudh Reddy (M25AI1109)
+    \end{center}
+\end{frame}
+
+% Enable logo for all following slides
+\logo{\includegraphics[height=0.8cm]{logo.jpg}}
+
+% Table of Contents
+\begin{frame}{Outline}
+    \tableofcontents
+\end{frame}
+
+% Section 1: Introduction
+\section{Introduction}
+
+\begin{frame}{Guardrails as a Service}
+    \begin{itemize}
+        \item AI safety and policy enforcement platform
+        \item Microservices architecture for scalability
+        \item Real-time evaluation of AI prompts and responses
+        \item Policy-based governance for AI applications
+        \item Comprehensive audit logging and monitoring
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Key Features}
+    \begin{columns}
+        \column{0.5\textwidth}
+        \textbf{Core Capabilities:}
+        \begin{itemize}
+            \item Policy management
+            \item Real-time evaluation
+            \item Lora based inference Model
+            \item Audit logging
+            \item Rate limiting
+        \end{itemize}
+
+        \column{0.5\textwidth}
+        \textbf{Technical Features:}
+        \begin{itemize}
+            \item RESTful API
+            \item Event-driven architecture
+            \item Caching with Redis
+            \item PostgreSQL persistence
+            \item Kafka message bus
+        \end{itemize}
+    \end{columns}
+\end{frame}
+
+% Section 2: Architecture
+\section{Architecture}
+
+\begin{frame}{Service Overview}
+    \begin{block}{Five Microservices}
+        \begin{enumerate}
+            \item \textbf{API Gateway} (Node.js) - Port 3000
+                  \begin{itemize}
+                      \item Authentication \& Authorization
+                      \item Request routing
+                      \item Rate limiting
+                  \end{itemize}
+            \item \textbf{Evaluation Service} (Node.js) - Port 3001
+            \item \textbf{Policy Service} (Node.js) - Port 3002
+            \item \textbf{Audit Service} (Node.js) - Port 3003
+            \item \textbf{Model Inference Service} (Python/FastAPI) - Port 8000
+        \end{enumerate}
+    \end{block}
+\end{frame}
+
+\begin{frame}{High-Level Architecture}
+    \centering
+    \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{services.png}
+\end{frame}
+
+\begin{frame}{C4 System Context}
+    \centering
+    \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{c4.png}
+\end{frame}
+
+% Section 3: Domain Model
+\section{Domain Model}
+
+\begin{frame}{Core Domain Entities}
+    \centering
+    \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{domain_model.png}
+\end{frame}
+
+\begin{frame}[fragile]{Sequence Diagram: Evaluation Flow}
+    \centering
+    \includegraphics[width=\textwidth,height=0.8\textheight]{sequence.png}
+\end{frame}
+
+% Section 4: Technology Stack
+\section{Technology Stack}
+
+\begin{frame}{Technology Stack}
+    \begin{columns}
+        \column{0.5\textwidth}
+        \textbf{Backend Services:}
+        \begin{itemize}
+            \item Node.js ($\geq$ 18.0.0)
+            \item TypeScript
+            \item Express.js
+            \item Python ($\geq$ 3.8)
+            \item FastAPI
+        \end{itemize}
+
+        \textbf{Infrastructure:}
+        \begin{itemize}
+            \item PostgreSQL (persistence)
+            \item Redis (caching)
+            \item Apache Kafka (messaging)
+        \end{itemize}
+
+        \column{0.5\textwidth}
+        \textbf{Development Tools:}
+        \begin{itemize}
+            \item npm ($\geq$ 8.0.0)
+            \item pip
+            \item ESLint
+            \item Prettier
+        \end{itemize}
+
+        \textbf{Testing \& Monitoring:}
+        \begin{itemize}
+            \item Jest (unit testing)
+            \item k6 (load testing)
+            \item Monitoring integration
+        \end{itemize}
+    \end{columns}
+\end{frame}
+
+% Section 6: Testing
+\section{Testing}
+
+\begin{frame}[fragile]{Load Testing with k6}
+    \textbf{Prerequisites:}
+    \begin{lstlisting}[language=bash]
+# macOS
+brew install k6
+
+# Windows
+choco install k6
+\end{lstlisting}
+
+    \textbf{Running Load Tests:}
+    \begin{lstlisting}[language=bash]
+cd load_test
+k6 run load_test.js
+
+# With web dashboard
+k6 run --out web-dashboard load_test.js
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Load Test Configuration}
+    \begin{block}{Default Load Test Pattern}
+        \begin{itemize}
+            \item 30s: Ramp up to 10 users
+            \item 1m: Ramp up to 25 users
+            \item 1m: Ramp up to 50 users
+            \item 2m: Maintain 50 users (peak load)
+            \item 30s: Ramp down to 0 users
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Configuration Notes}
+        \begin{itemize}
+            \item Update host link to API Gateway URL
+            \item Include authentication tokens
+            \item Ensure all services are running before testing
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}{Load Test Results}
+    \centering
+    \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{load_test_result_1.png}
+\end{frame}
+
+\section{Quality attributes}
+\begin{frame}{Quality attributes}
+    \begin{enumerate}
+        \item Security
+              \begin{itemize}
+                  \item Centralized authentication and authorization via API Gateway
+                  \item Rate limiting to prevent abuse
+              \end{itemize}
+        \item Scalability
+              \begin{itemize}
+                  \item Microservices architecture allows independent scaling
+                  \item Redis caching to reduce latency
+                  \item Kafka for asynchronous communication
+              \end{itemize}
+        \item Flexibility
+              \begin{itemize}
+                  \item Easy to add new policies and rules
+                  \item Modular services for future enhancements
+              \end{itemize}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Questions?}
+    \begin{center}
+        \Huge{Thank You!}
+
+        \vspace{1cm}
+
+        \large{GitHub: github.com/pradeepannepu/guardrails-as-a-service}
+    \end{center}
+\end{frame}
+
+\end{document}

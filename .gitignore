@@ -26,3 +26,7 @@ TestResults.xml
 *.log
 *.out
 *.gz
+*.nav
+*.toc
+*.vrb
+*.snm
