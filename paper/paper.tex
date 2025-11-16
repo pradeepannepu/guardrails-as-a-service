@@ -31,12 +31,12 @@ Enterprises increasingly rely on the agentic systems and exposing varous tools a
 It is not a one time job for these enterprises to set these guardrails and forget about it, as the business needs and complaince requirements keep changing, these guardrails need to be updated frequently. Hence the need for a policy service which can help enterprises to create, update and manage these guardrails easily.We address these gaps by designing a scalable system for the guardrails evaluation and continuous policy updates and management in this study.
 
 \section{Contributions}
-The work provides: (1) A hybrid evaluation architecture combining deterministic rule filtering and vector similarity; (2) An extensible handler interface enabling semantic and emerging policy types with low change cost; (3) A hash-linked audit log for tamper-evidence without blockchain overhead; (4) A metrics-driven evaluation plan aligning architectural tactics with verifiable quality attributes.
+The work provides: (1) A evaluation architecture combining deterministic rule filtering of plicies for guards; (2) An extensible handler interface enabling emerging policy types with low change cost; (3) A audit log for tamper-evidence; (4) A metrics-driven evaluation plan for continous eval and agentic system that use llms.
 
 \section{System Architecture}
 \begin{figure}[htbp]
   \centerline{\includegraphics[width=\columnwidth]{services.png}}
-  \caption{System Architecture: Hybrid policy evaluation with event-driven decoupling}
+  \caption{System Architecture}
   \label{fig:services}
 \end{figure}
 
@@ -45,7 +45,8 @@ Refer Fig.~\ref{fig:services} For System Architecture
 \noindent Core components:
 \begin{itemize}[leftmargin=*]
   \item API Gateway: Authentication, authorization, rate limiting.
-  \item Policy Service: CRUD, versioning, vector indexing (pgvector \cite{pgvector}).
+  \item Policy Service: CRUD, versioning, vector indexing (pgvector \cite{pgvector}), and retrieval.
+  \item Policy Handlers: Rule-based evaluation, semantic filtering, custom models and custom handlers.
   \item Evaluation Plane: Cache-first retrieval, rule + semantic evaluation, decision event emission.
   \item Audit Logger: Consumes decision events; persists hash-chained records.
   \item Redis: Low-latency hot-set and embedding cache.
@@ -54,23 +55,49 @@ Refer Fig.~\ref{fig:services} For System Architecture
 \end{itemize}
 
 \section{Design Methodology}
-Microservice decomposition isolates policy mutation from evaluation throughput. Event-driven processing reduces synchronous coupling. Vector similarity augments metadata filtering, allowing semantically proximate policy selection. Hash chaining supplies integrity assurance with linear verification.
+Microservice decomposition isolates policy mutation from evaluation throughput. Event-driven processing reduces synchronous coupling. Vector similarity augments metadata filtering, allowing semantically proximate policy selection. Hash chaining supplies integrity assurance with linear verification. Refer to Fig.~\ref{fig:c4} for the system context diagram.
 
 \begin{figure*}[htbp]
   \centerline{\includegraphics[width=\textwidth]{c4.png}}
-  \caption{System Architecture: Hybrid policy evaluation with event-driven decoupling}
+  \caption{C4 - System context diagram}
   \label{fig:c4}
 \end{figure*}
 
+\subsection{Custom Guard Model}
+We have trained the Gemma model \cite{gemma} with custom domain language to act as a guard model. We choosen the networking, interconnections and datacenter terminologies as allowed and disallowed to respond with any general knowledge.
+
+Custom trained model is inferenced via micro service (inference service via python fast api). The policy service was dynamic and can accept muliple policy handlers, Our custom model was one of the handler
+\subsection{Domain Model}
+Refer to Fig.~\ref{fig:domain_model} for Domain model, entities, we made it customizable to accept new policy types and handlers and choosen SQL based relational model for easy extensibility. \\
+\textbf{EvaluationRequest}: A user's request to evaluate one or more model predictions against a set of policies and rules. \\
+\textbf{EvaluationResult}: The outcome of processing an EvaluationRequest (including which rules were violated). \\
+\textbf{Policy}: A compliance, safety, quality, or business policy composed of one or more rules. \\
+\textbf{Rule}: A specific, testable condition inside a Policy. \\
+Violation: A record that a particular Rule (within its Policy) was broken during evaluation. \\
+\textbf{ModelPrediction}: An individual output (e.g., a generated text, classification, score) produced by a model that is being evaluated. \\
+\textbf{AuditLog}: A formal log entry capturing the evaluation event for traceability and governance. \\
+\textbf{User}: The actor (human or system identity) who initiated the evaluation.
+
 \begin{figure}[htbp]
   \centerline{\includegraphics[width=\columnwidth]{domain_model.png}}
-  \caption{System Architecture: Hybrid policy evaluation with event-driven decoupling}
+  \caption{Domain Model: Policy, Handler, Decision Event}
   \label{fig:domain_model}
 \end{figure}
 
+\subsection{Sequence Flow}
+Refer to Fig.~\ref{fig:sequence} for Sequence diagram of policy evaluation flow.
+\begin{itemize}
+  \item Client request with context hits API gateway. Authentication, authorization, rate limiting are performed in this layer.
+  \item Policy Service retrieves candidate policies via metadata filtering + vector similarity
+  \item Evaluation Plane invokes appropriate Policy Handlers. Our Custom model handler is one of them. which is trained to allow only networking and intercoonnections related queries.
+  \item Handlers evaluate context against policies; emit Decision Events.
+  \item Audit Logger persists hash-linked Decision Events for continous evaluation of the system.
+\end{itemize}
+
+
 \begin{figure*}[htbp]
   \centerline{\includegraphics[width=\textwidth]{sequence.png}}
-  \caption{System Architecture: Hybrid policy evaluation with event-driven decoupling}
+  \caption{Sequence Diagram: Policy Evaluation Flow}
   \label{fig:sequence}
 \end{figure*}
 
@@ -78,11 +105,11 @@ Microservice decomposition isolates policy mutation from evaluation throughput. 
 \subsection{Scalability}
 Tactics: Stateless pods, horizontal autoscaling, Redis caching, asynchronous buffering. Metrics: P95 latency $<150$\,ms under 2000 requests/sec; cache hit ratio correlated with latency reduction.
 
-\begin{figure}[htbp]
-  \centerline{\includegraphics[width=\columnwidth]{load_test_result_1.png}}
-  \caption{System Architecture: Hybrid policy evaluation with event-driven decoupling}
+\begin{figure*}[htbp]
+  \centerline{\includegraphics[width=\textwidth]{load_test_result_1.png}}
+  \caption{Load test result by k6}
   \label{fig:load_test_result_1}
-\end{figure}
+\end{figure*}
 
 \subsection{Extensibility}
 A \texttt{PolicyHandler} interface:
@@ -109,16 +136,10 @@ Periodic verification recomputes sequence and alerts on mismatch; target audit l
 \subsection{Maintainability}
 Modular boundaries and standardized evaluation signatures reduce change effort. KPIs: Mean Time To Change for routine policy extension < 0.5 developer-day.
 
-\section{Implementation Overview}
-Policies stored in PostgreSQL with pgvector embeddings; evaluation pipeline performs:
-(1) Cache lookup;
-(2) Vector similarity search (threshold-based);
-(3) Rule evaluation;
-(4) Decision event emission;
-(5) Audit service hash-link persistence.
-
 \section{Evaluation Plan}
-Phases: (1) Functional tests (unit, integration); (2) Load tests (k6 ramp to 2000 req/sec); (3) Resilience (broker partition throttling). Metrics scraped every 5\,s; Grafana dashboards visualize throughput, latency, audit lag. Success: No message loss; hash chain validates end-to-end; latency targets met.
+Phases: (1) Load tests (k6 ramp to 2000 req/sec); (2) Resilience (broker partition throttling). Metrics scraped every 5\,s; Grafana dashboards visualize throughput, latency, audit lag. Success: No message loss; hash chain validates end-to-end; latency targets met.
+
+We ran a load test using k6 tool and the results are shown in Fig.~\ref{fig:load_test_result_1}.
 
 \section{Security Considerations}
 Current: JWT-based client auth; least-privilege DB roles; rate limiting. Planned: mTLS inter-service; policy signature verification for provenance.
@@ -130,7 +151,7 @@ OPA \cite{opa} offers strong declarative evaluation but lacks semantic retrieval
 The proposed Guardrails-as-a-Service platform aligns architectural tactics with measurable quality attributes. Hybrid policy evaluation and hash-linked auditing together enhance governance fidelity and trust. Future work targets production hardening, expanded semantic handlers, and full distributed tracing.
 
 \section*{Acknowledgment}
-The authors would like to thank the Indian Institute of Technology Jodhpur for supporting this study.
+we would like to thank the Indian Institute of Technology Jodhpur for supporting this study.
 
 \begin{thebibliography}{99}
   \bibitem{opa} Open Policy Agent Documentation. [Online]. Available: \url{https://www.openpolicyagent.org}
@@ -138,6 +159,9 @@ The authors would like to thank the Indian Institute of Technology Jodhpur for s
   \bibitem{prometheus} Prometheus Documentation. [Online]. Available: \url{https://prometheus.io}
   \bibitem{pgvector} pgvector Extension Documentation. [Online]. Available: \url{https://github.com/pgvector/pgvector}
   \bibitem{otel} OpenTelemetry Specification. [Online]. Available: \url{https://opentelemetry.io}
+  \bibitem{gemma} Gemma 3 Technical Report \url{https://arxiv.org/pdf/2503.19786}
+  \bibitem{DuoGuard} (2025) DuoGuard: A Two-Player RL-Driven Framework for Multilingual LLM Guardrails. arXiv preprint arXiv:2502.05163. Available: \url{https://arxiv.org/abs/2502.05163}
+  \bibitem{rebedea-etal-2023-nemo} {N}e{M}o Guardrails: A Toolkit for Controllable and Safe {LLM} Applications with Programmable Rails \url{https://aclanthology.org/2023.emnlp-demo.40/}
 \end{thebibliography}
 
 \end{document}
